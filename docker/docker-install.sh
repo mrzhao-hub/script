@@ -1,4 +1,4 @@
-#/bin/bash
+#!/bin/bash
 
 sudo yum remove docker*
 sudo yum install -y yum-utils

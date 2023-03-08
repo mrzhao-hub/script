@@ -1,7 +1,4 @@
-#/bin/bash
-
-#引入系统函数库
-. /etc/init.d/functions
+#!/bin/bash
 
 mysql_version="5.7"
 mysql_image="mysql:${mysql_version}"
@@ -25,8 +22,6 @@ build() {
     # 设置数据目录
     [[ ! -d ${base_dir} ]] && mkdir -p ${base_dir}/{log,data,conf}
     
-    echo ${my-cnf} > ${base_dir}/conf/my.cnf
-
     cat << EOF > ${base_dir}/conf/my.cnf
 [client]
 default-character-set=utf8
@@ -44,17 +39,17 @@ skip-name-resolve
 transaction-isolation=READ-COMMITTED
 innodb_log_file_size=256M
 max_allowed_packet=34M
-    EOF
+EOF
 
     # 拉取镜像
-    [[ "$(docker images -q ${mysql_image}:${mysql_version}) 2> /dev/null" == "" ]] && docker pull ${mysql_image}:${mysql_version}
+    [[ "$(docker images -q ${mysql_image}) 2> /dev/null" == "" ]] && $(docker pull ${mysql_image})
     docker run -p ${mysql_port}:3306 --name ${mysql_name} \
     -v  ${base_dir}/log:/logs \
     -v  ${base_dir}/data:/var/lib/mysql \
     -v  ${base_dir}/conf:/etc/mysql/conf.d \
     -e MYSQL_ROOT_PASSWORD=${mysql_passwd} \
     --privileged=true \
-    -d ${mysql_image}:${mysql_version}
+    -d ${mysql_image}
 
     exit_container
     retval=$?
