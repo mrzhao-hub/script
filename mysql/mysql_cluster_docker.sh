@@ -245,7 +245,7 @@ EOF
     ###检查容器是否启动成功
     for container in "${all_containers[@]}"
     do
-        until docker exec ${container} sh -c 'export MYSQL_PWD='${root_password}'; mysql -u root -e ";"'
+        until docker exec ${container} sh -c 'export MYSQL_PWD='${mysql_root_passwd}'; mysql -u root -e ";"'
         do
             echo "连接${container}中...  每${retry_duration}s尝试连接一次，知道容器正常启动....."
             sleep ${retry_duration}
@@ -255,9 +255,9 @@ EOF
 
     #扩权给${mysq_user}
     privi_user='GRANT REPLICATION SLAVE ON *.* TO "'${mysql_user}'"@"%" IDENTIFIED BY "'${mysql_password}'"; FLUSH PRIVILEGES;'
-    docker exec ${master_container} sh -c "export MYSQL_PWD="${root_password}"; mysql -u root -e '${privi_user}'"
+    docker exec ${master_container} sh -c "export MYSQL_PWD="${mysql_root_passwd}"; mysql -u root -e '${privi_user}'"
     #查看主服务器状态
-    master_status=`docker exec ${master_container} sh -c 'export MYSQL_PWD='${root_password}'; mysql -u root -e "SHOW MASTER STATUS"'`
+    master_status=`docker exec ${master_container} sh -c 'export MYSQL_PWD='${mysql_root_passwd}'; mysql -u root -e "SHOW MASTER STATUS"'`
     #获取信息
     current_log=`echo ${master_status} | awk '{print $6}'`
     current_position=`echo ${master_status} | awk '{print $7}'`
@@ -271,7 +271,7 @@ EOF
             MASTER_LOG_FILE='$current_log',
             MASTER_LOG_POS=$current_position;"
 
-    start_slave_cmd='export MYSQL_PWD='$root_password'; mysql -u root -e "'
+    start_slave_cmd='export MYSQL_PWD='$mysql_root_passwd'; mysql -u root -e "'
     start_slave_cmd+="$start_slave_stmt"
     start_slave_cmd+='START SLAVE;"'
     # exit_container
@@ -280,7 +280,7 @@ EOF
         # 从服务器连接主互通
         docker exec $slave sh -c "$start_slave_cmd"
         # 查看从服务器得状态
-        docker exec $slave sh -c "export MYSQL_PWD='$root_password'; mysql -u root -e 'SHOW SLAVE STATUS \G'"
+        docker exec $slave sh -c "export MYSQL_PWD='$mysql_root_passwd'; mysql -u root -e 'SHOW SLAVE STATUS \G'"
     done
     echo -e "\033[42;34m finish success !!! \033[0m"
     retval=$?
