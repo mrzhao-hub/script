@@ -5,6 +5,8 @@ mysql_image="mysql:${mysql_version}"
 mysql_name="mysql"
 mysql_port=3306
 mysql_root_passwd=123456
+mysql_user="mydb_slave_user"
+mysql_passwd="mydb_slave_pwd"
 
 base_dir="/opt/mysql_cluster"
 mysql_master="${base_dir}/master"
@@ -142,8 +144,8 @@ EOF
 MYSQL_ROOT_PASSWORD=${mysql_root_passwd}
 MYSQL_PORT=${mysql_port}
 # 数据库配置
-MYSQL_USER=mydb_slave_user
-MYSQL_PASSWORD=mydb_slave_pwd
+MYSQL_USER=${mysql_user}
+MYSQL_PASSWORD=${mysql_passwd}
 # MYSQL_DATABASE=mydb
 # 设置为大小写不敏感
 MYSQL_LOWER_CASE_TABLE_NAMES=0
@@ -152,18 +154,18 @@ EOF
 MYSQL_ROOT_PASSWORD=${mysql_root_passwd}
 MYSQL_PORT=${mysql_port}
 # 数据库配置
-MYSQL_USER=mydb_slave_user
-MYSQL_PASSWORD=mydb_slave_pwd
+MYSQL_USER=${mysql_user}
+MYSQL_PASSWORD=${mysql_passwd}
 # MYSQL_DATABASE=mydb
 # 设置为大小写不敏感
 MYSQL_LOWER_CASE_TABLE_NAMES=0
 EOF
-    cat << EOF > {mysql_slave2}/mysql_slave2.env
+    cat << EOF > ${mysql_slave2}/mysql_slave2.env
 MYSQL_ROOT_PASSWORD=${mysql_root_passwd}
 MYSQL_PORT=${mysql_port}
 # 数据库配置
-MYSQL_USER=mydb_slave_user
-MYSQL_PASSWORD=mydb_slave_pwd
+MYSQL_USER=${mysql_user}
+MYSQL_PASSWORD=${mysql_passwd}
 # MYSQL_DATABASE=mydb
 # 设置为大小写不敏感
 MYSQL_LOWER_CASE_TABLE_NAMES=0
