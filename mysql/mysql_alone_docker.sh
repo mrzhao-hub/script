@@ -9,7 +9,25 @@ mysql_name="mysql"
 mysql_port=3306
 mysql_passwd=123456
 
-my-cnf="""
+base_dir="/opt/mysql"
+
+# 判断容器是否启动
+exit_container() {
+    if [[ "$(docker inspect -f {{.State.Status}} ${mysql_name}) 2> /dev/null" == "" ]]; then
+        echo "${mysql_name}尚未启动"
+        exit 1
+    fi
+}
+
+
+# 创建MYSQL容器
+build() {
+    # 设置数据目录
+    [[ ! -d ${base_dir} ]] && mkdir -p ${base_dir}/{log,data,conf}
+    
+    echo ${my-cnf} > ${base_dir}/conf/my.cnf
+
+    cat << EOF > ${base_dir}/conf/my.cnf
 [client]
 default-character-set=utf8
 
@@ -26,23 +44,8 @@ skip-name-resolve
 transaction-isolation=READ-COMMITTED
 innodb_log_file_size=256M
 max_allowed_packet=34M
-"""
-base_dir="/opt/mysql"
+    EOF
 
-# 判断容器是否启动
-exit_container() {
-    if [[ "$(docker inspect -f {{.State.Status}} ${mysql_name}) 2> /dev/null" == "" ]]; then
-        echo "${mysql_name}尚未启动"
-        exit 1
-    fi
-}
-
-
-# 创建MYSQL容器
-build() {
-    # 设置数据目录
-    [[ ! -d ${base_dir} ]] && mkdir -p ${base_dir}/{log,data,conf}
-    echo ${my-cnf} > ${base_dir}/conf/my.cnf
     # 拉取镜像
     [[ "$(docker images -q ${mysql_image}:${mysql_version}) 2> /dev/null" == "" ]] && docker pull ${mysql_image}:${mysql_version}
     docker run -p ${mysql_port}:3306 --name ${mysql_name} \
