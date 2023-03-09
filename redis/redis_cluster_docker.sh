@@ -2,7 +2,7 @@
 
 ### redis集群三主三从
 
-base_dir="opt/redis_cluster"
+base_dir="/opt/redis_cluster"
 retry_duration=5
 
 [[ ! -d ${base_dir} ]] && mkdir -p ${base_dir}
