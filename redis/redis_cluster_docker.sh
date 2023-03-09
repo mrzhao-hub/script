@@ -62,7 +62,7 @@ docker_ip() {
 
 for node in $(seq 1 6)
 do
- until docker exec redis-node${node} sh -c " redis-cli -h 192.168.48.30 -p 639${node} info | grep redis_version"
+ until docker exec redis-node${node} sh -c " redis-cli -h $(docker_ip) -p 639${node} info | grep redis_version"
  do
    echo "连接redis-node${node}中...  每${retry_duration}s尝试连接一次，知道容器正常启动....."
    sleep ${retry_duration}
